@@ -1,0 +1,72 @@
+<html>
+<head>
+        <title>RazTest</title>
+        <style>canvas { width: 100%; height: 100% }</style>
+</head>
+<body>
+    <script src="js/lib/three.js">//3D Rendering Engine</script>
+    <script src="js/lib/jquery.js">//For event handling</script>
+    <script src="js/Sally.js">//The game engine</script>
+    <script>
+        // Setup
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        var obs = {};
+        
+        var gloader = new THREE.JSONLoader();
+        gloader.load("models/monkey.js", function(geometry){
+            var material = new THREE.MeshLambertMaterial({color: 'grey'});
+            var monkey = new THREE.Mesh(geometry, material);
+            obs.monkey = monkey;
+            //monkey.position.set(1,-1,1);
+            scene.add(monkey);
+        });
+        
+        //var cube = new THREE.Mesh(geometry, material);
+        //scene.add(cube);
+
+        camera.position.z = 5;
+        clock = new THREE.Clock();
+        
+        // Quick fix, change background color from black to white
+        renderer.setClearColor( 0xffffff, 1) 
+        
+        //Lighting
+        // directional lighting
+        var directionalLight = new THREE.DirectionalLight(0xffffff);
+        directionalLight.position.set(1, 1, 1).normalize();
+        scene.add(directionalLight);
+        
+        
+        //Set up dragging
+        dragging = false;
+        $(document).mousedown(function(e){
+            dragging = true;
+        });
+        $(document).mouseup(function(e){
+            dragging = false;
+        });
+        $(document).mousemove(function(e){
+            dragging = true; // Temporarily disable dragging.
+            if(dragging){
+                obs.monkey.rotation.y = (e.pageX-(window.innerWidth/2))*.001;
+                obs.monkey.rotation.x = (e.pageY-(window.innerHeight/2))*.001;
+            }
+        });
+        
+        // Begin the game/render loop
+        var render = function () {
+        requestAnimationFrame(render);
+        //cube.rotation.x += deltaTime(clock.getDelta()) * 0.8;
+        renderer.render(scene, camera);
+        };
+
+        render();
+    </script>
+</body>
+</html>
